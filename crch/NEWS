@@ -1,0 +1,98 @@
+Changes in Version 1.0-3
+  
+  o updated contact information
+
+
+Changes in Version 1.0-1
+  
+  o Added argument 'type' to crch() which can be set to "crps" for parameter
+    estimation with minimum CRPS instead of maximum likelihood. 
+
+  o Added S3 method of crps() from scoringRules for "crch" objects.
+
+  o Improvements for the predict() method:
+    - new types "parameter", "density", "probability", and "crps"
+    - with type="response" now the expected value and not the location 
+      parameter is returned (not equal for censored and truncated 
+      distributions). For better backward compatibility, the default type is
+      set to "location".
+
+  o Added pit(), rootogram(), and simulate() methods for crch objects.
+
+  o Changed argument names mean and sd to location and scale in logistic and
+    student-t distribution functions 
+
+  o Added new function "crch.stabsel" for stability selection based on    
+    "crch.boost.fit". Small S3 methods for the returned class "stabsel.crch"
+    are also provided.
+  
+
+Changes in Version 1.0-0
+  
+  o New release accompanying the R-Journal paper: "Heteroscedastic Censored 
+    and Truncated Regression with crch" by Messner, Mayr, and Zeileis
+    which appears as R-Journal 8(1). See also citation("crch"). 
+    
+  o Added estfun() method for crch objects
+
+
+Changes in Version 0.9-2
+  
+  o The crch() function now supports coefficient optimization by
+    boosting to automatically select the most relevant input variables 
+    in high dimensional data settings. Extractor and plotting functions 
+    for corresponding crch.boost objects are also available.
+
+  o Transferred functions to estimate density, distribution, score, and 
+    Hessian matrices to C-code to accelerate coefficient optimization.
+
+  o Added option to crch() to avoid computation of covariance matrix
+
+  o Added left and right arguments to predict.crch() and 
+    predict.crch.boost() to allow quantile predictions for non-constant 
+    censoring or truncation points.
+
+
+Changes in Version 0.9-1
+
+  o Added model.matrix() and model.frame() methods for crch objects
+
+  o Bug Fix in predict.crch(): In previous versions predictions for 
+    models with other link functions than the log gave wrong results
+
+
+Changes in Version 0.9-0
+
+  o Added vignette to introduce the crch() function with some
+    theoretical background and an illustrating example:
+    vignette("crch", package = "crch")
+
+  o The crch() function now also supports truncated responses.
+    Furthermore added a wrapper function trch() to fit truncated
+    regression models.
+
+  o crch(): Analytical gradients and Hessian matrices are provided for most 
+    models to speed up maximum likelihood optimization
+    (not available for student-t distribution with degrees of freedom
+    estimation).  
+
+  o crch(): For the scale model a link function can now be specified
+    (log, identity, or quadratic). In previous version only the log
+    was supported.
+
+  o Added functions for probability density, cumulative distribution, 
+    random numbers, and quantiles for censored and truncated normal, 
+    logistic, and student-t distributions.
+
+  o The residuals() method for crch objects now also provides quantile 
+    residuals (Dunn and Smyth 1996).
+
+  o Added update() method for crch objects.
+
+
+Changes in Version 0.1-0
+
+  o First official release of the package on CRAN. See citation("crch")
+    for the accompanying manuscripts. Note that the interface of both
+    crch() and hxlr() is still under development and might change in
+    future versions of the package.

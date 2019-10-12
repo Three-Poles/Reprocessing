@@ -1,0 +1,84 @@
+01/18 fixed typos in plotProbcast help file (Yuanting Zhang)
+      included tech report (inst/doc/techrep.pdf)
+	
+03/17 removed date handling from some fitBMA* functions. [Jakob Messner]
+	
+06/16 fixed plot function for gamma0 model [Mabrouk Abaza]
+
+05/15 fixed gamma and gamma0 models to handle single ensemble member
+
+03/15 zero lower bound enforced in bias correction for quantileForecast with
+      gamma and gamma0 models [Yang Xingchen]
+
+01/15 fitBMAgamma robustification; added optim finite difference interval
+         to control parameters for gamma0 and gamma models [Maxime Taillardat]
+         changed ensembleData$obs to dataVerifObs(ensembleData) in dataNA
+         registered all S3 methods
+
+04/14 corrected call to dataNA in quantileForecast.fitBMAgamma and
+      corrected fitBMAgamma help file [Maxime Taillardat]
+
+01/14 corrected plot functions for gamma/gamma0 to transform obs  [Bo Madsen]
+
+01/14 removed require(chron) [CRAN]
+
+10/13 fixed date handling in cdf functions [Sandor Baran]
+
+07/13 shortened help file example timings
+
+02/13 changed plot methods for precip (gamma0) and wind speed (gamma) to
+           add transformation to horizontal axis label [Chang Eck]
+      changed matchEnsembleMembers methods to properly return result
+
+01/12 sd[] <- to sd <- for exchangeable, unequal variances [Henri Stephan]
+
+11/11 included a work around in fitBMAgamma0 and quantile.fitBMSgamma0 that 
+      helps in situations where the bias coef estimates fall near or below 0
+      removed date check from quantileForecast.fitBMA functions
+
+10/11 improved data compression
+      fixed problems with robustness of pop estimates for precip (Zhi Li)
+
+09/11 fixed problems with low precip (Alex Lenkowski)
+      added combine function for forecasing models
+      compressed the srft data
+      added verifRankHist, pitHist, and verifPlot functions
+
+06/10 fixed problems with subsetting for ensembleData
+
+03/10 fixed variance model for gamma0 (precip)
+
+12/09 fixed lower bound in quantBMAnormal
+
+11/09 fixed gamma0 model to handle more low precip cases
+
+09/09 added startup speed specification to ensembleData 
+      fixed verification rank histogram to range from 1 to n+1
+
+09/09 fixed gamma0 model to handle cases where there are no 0 forecasts
+
+06/09 modified estimation in gamma0 and gamma to do true EM 
+      updated bias correction strategy to handle 0 forc in gamma and gamma0 
+
+05/09 fixed crps calculation for gamma0 and gamma models
+      changed call to cdfBMAgamma0 to cdfBMAgamma in cdf.ensembleBMAgamma
+
+03/09 changed nonunique forecast error exit to warning
+
+01/09 added subsetting (via date) for fitted BMA models
+      changed ensembleDates to ensembleValidDates
+      added forecastHour and initializationTime attrributes to model fits  
+      changed crps to CRPS and added modeified crps; changed MAE to mae
+      added verifRankHist function
+
+12/08 modified ensembleData function for efficiency    
+      added forecastHour requirement for ensembleData
+      trainingRule changed to trainingDays
+      added wind speed data modeling
+      changed eps to tol in control functions
+
+11/08 added pit function
+
+10/08 fixed brierScore so that it works with one threshold
+      fixed help file syntax
+

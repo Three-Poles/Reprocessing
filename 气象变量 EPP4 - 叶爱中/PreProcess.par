@@ -1,0 +1,575 @@
+0 flagC  19 please select a function model, the number is  the flowing title number
+0 flagOs 1   please select Operating system, 1-windows  2-linux 
+
+0 $ **************************************************
+0 $ 0. debug subroutings and functions
+0 $ **************************************************
+
+
+1 $ **************************************************
+1 $ 1. 2.5*2.5 GFS data interpolate to 0.125*0.125 
+1 $ **************************************************
+1 BeginYear 1981
+1 EndYear 2003
+1 OldGFSdata1.ncols 25
+1 OldGFSdata1.nrows 12
+1 OldGFSdata1.leadT 14
+1 OldGFSdata1.cellsize 2.5
+1 OldGFSdata1.xllcorner -125  !-65
+1 OldGFSdata1.yllcorner 25
+   
+1 NewGFSdata2.ncols 464
+1 NewGFSdata2.nrows 224 
+1 NewGFSdata2.leadT 14
+1 NewGFSdata2.cellsize 0.125
+1 NewGFSdata2.xllcorner -124.9375   
+1 NewGFSdata2.yllcorner 25.0625 
+ 
+1 Weightfile E:\EPP4\DATA\w
+1 GFSdata1.BName E:\EPP4\DATA\usa_apcp_gfs_ensmean\apcp_ensmean24_
+1 GFSdata2.BName E:\EPP4\DATA\USA0125P\
+1 GFSdata1.MName E:\EPP4\Program\obw.asc
+
+2 $ **************************************************
+2 $ 2. daily observed data to 6 hours data and statistics
+2 $ **************************************************
+2 BeginYear 1981
+2 EndYear   2009
+2 Ngrids 52455  
+
+2 cellsize 0.125
+2 xllcorner -124.9375   
+2 yllcorner 25.0625 
+2 Obsdata1.Tim 4
+2 Obsdata1.CuVa 1
+2 Obsdata1.ncols 464         
+2 Obsdata1.nrows 224           
+2 Obsdata1.NVara  4         
+2 Obsdata1.undef -999.9  
+2 obw  E:\EPP4\Program\obw.asc
+2 originalFile G:\USA\data\Merge1949-2010\daily_forcing\data_
+2 6hourFile E:\EPP4\DATA\Usa6HourP\
+
+3 $ **************************************************
+3 $ 3. read binary file ,write ascII file 
+3 $ **************************************************
+3 BToAfile E:\EPP4\DATA\Usa6HourP\003\186 G:\CFSUSA_prate\19980302.bin  E:\EPP4\DATA\HindcastCFS\322\048.bin  
+
+4 $ **************************************************
+4 $ 4. Calculate the Nash-Sutcliffe efficiency  and correlation coefficient
+4 $ **************************************************
+4 CanE.leadT 14
+4 CanE.flagPo 1  ! select compute daily statistic, 1-yes  0-not 
+4 CanE.ObFile E:\EPP4\DATA\Usa6HourP\  
+4 CanE.SiFile E:\EPP4\DATA\USA0125P\  
+4 CanE.ReFile E:\EPP4\DATA\Para\R\    
+4 CanE.DoFile E:\EPP4\Program\obw.asc
+4 CanE.minwin   31
+4 CanE.maxwin   61
+4 CanE.BeginYear 1981
+4 CanE.EndYear 2003
+4 CanE.Events 14
+4 CanE.Estart $please write CanE.Events timing in next line
+4  1 1 1 1 1 1 1 1 1 1 1 1 1 1  
+4 CanE.Estop $please write CanE.Events timing in next line
+4  1 2 3 4 5 6 7 8 9 10 11 12 13 14
+
+5 $ **************************************************
+5 $ 5.from historical observed data and forecast to get parameter of EPP model for GFS
+5 $ **************************************************
+5 CanE.leadT 14
+5 CanE.ObFile E:\EPP4\DATA\Usa6HourP\  
+5 CanE.SiFile E:\EPP4\DATA\USA0125P\
+5 CanE.ReFile E:\EPP4\DATA\Para\CFSEP\    
+5 CanE.DoFile E:\EPP4\Program\obw.asc
+5 CanE.minwin   31
+5 CanE.maxwin   61
+5 CanE.x1   1 141 458 
+5 CanE.x2   5 464  141 458  
+5 CanE.y1   1 55 178 
+5 CanE.y2   224 55 178 
+5 CanE.BeginYear 1981
+5 CanE.EndYear 2002
+5 CanE.Events 14
+5 CanE.Estart $please write CanE.Events timing in next line
+5  1 1 1 1 1 1 1 1 1 1 1 1 1 1  
+5 CanE.Estop $please write CanE.Events timing in next line
+5  1 2 3 4 5 6 7 8 9 10 11 12 13 14
+ 
+5 CanE.minall 150   !minimum number of all data 150
+5 CanE.minpos 50    !minimum number of data > pthresh_fcst 50
+5 CanE.pop_fraction 0.97   !fraction of total precip > 0
+5 CanE.iobstran 1      ! observations probability distribution
+5 CanE.ifcsttran 1     ! forecast probability distribution  
+5 CanE.iopt_rho 1      ! correlation coefficient selection  
+5 CanE.cor_weight 0.5 
+5 CanE.cavgobsx 50.8   ! maximum conditional mean precipitation value (mm/6hr)50.8
+5 CanE.cavgfcstx 50.8  ! maximum conditional mean precipitation value (mm/6hr)50.8
+5 CanE.verstats 0  !1-check calibration 0-no check  
+5 CanE.nparint 5 !interval of calculation in 365 days
+5 CanE.nems  30  !  number of ensemble members 
+
+6 $ **************************************************
+6 $ 6(19).hindcast with EPP parameter
+6 $ **************************************************
+
+6 epp.leadT 8
+
+6 epp.EpFile E:\师大项目\数字流域\Data\GEFS\19562012.txt
+6 epp.ObFile E:\师大项目\数字流域\Data\GEFS\19562012.txt 
+6 epp.SiFile E:\师大项目\数字流域\Data\GEFS\   
+6 epp.PaFile E:\师大项目\数字流域\Data\Para\   
+6 epp.DoFile E:\EPP4\EPPSystem\EPP4\obw.asc
+6 epp.ReFile E:\师大项目\数字流域\Data\Hindcast\
+ 
+6 epp.BeginYear 1986
+6 epp.EndYear 2011
+6 epp.BeginYearEns 1986
+6 epp.EndYearEns 2011
+
+6 epp.x1  1  
+6 epp.x2  1
+6 epp.y1  1    
+6 epp.y2  1 11
+
+6 epp.Events 8
+6 epp.Estart $please write CanE.Events timing in next line
+  
+6   1 2 3 4 5 6 7 8 9 10 11 12 13 14 
+6 $ 1 1 1 1 1 1 1 1 1 1 1 1 1 1  
+6 epp.Estop $please write CanE.Events timing in next line
+6  1 2 3 4 5 6 7 8 9 10 11 12 13 14
+  
+6 epp.iobstran 1      ! observations probability distribution
+6 epp.ifcsttran 1     ! forecast probability distribution  
+ 
+6 $epp.nems  23  !  number of ensemble members 
+
+7 $ **************************************************
+7 $ 7（20）.CFS data merge from Global data to study domain
+7 $ **************************************************
+7 CFSData1.CFile E:\师大项目\数字流域\Data\CFS\CFSlonlat1.txt
+7 CFSData1.DFile F:\CFSv2\ G:\CFSv2\  E:\EPP4\DATA\CFSUSA\ G:\prate\ \cygdrive\
+7 CFSData1.WFile E:\师大项目\数字流域\Data\CFS\wCfs.txt
+7 CFSData1.MName E:\师大项目\数字流域\Data\CFS\GFSlonlatYLJ_76.txt
+7 CFSData1.OutFile E:\师大项目\数字流域\Data\CFS\    E:\EPP4\DATA\CFSUSA_P18\  I:\CFSUSA_    I:\CFSUSA\
+7 CFSData1.EName prate tmp2m 
+7 CFSData1.leadT 280  45 
+7 CFSData1.BeginYear     2009 1999 2005 1999
+7 CFSData1.EndYear       2009 2004 2009 2009
+7 CFSData1.ifile  22
+7 CFSData1.ihour 0
+
+8 $ **************************************************
+8 $ 8.CFS data manage from date form to point form
+8 $ **************************************************
+ 
+8 CFSData2.DFile  E:\师大项目\数字流域\Data\CFS\prate\   
+8 CFSData2.MName   E:\师大项目\数字流域\Data\CFS\GFSlonlatYLJ_76.txt
+8 CFSData2.OutFile E:\师大项目\数字流域\Data\CFS\CFSPoint_prate\ 
+8 CFSData2.leadT  280
+8 CFSData2.BeginYear   1982 
+8 CFSData2.EndYear    2009
+8 CFSData2.ifile  22
+8 CFSData2.EName prate tmp2m   
+8 CFSData2.nparint 5
+8 CFSData2.x1   1   
+8 CFSData2.x2   1   
+8 CFSData2.y1   1  
+8 CFSData2.y2   76   
+9 $ **************************************************
+9 $ 9. Calculate the Nash-Sutcliffe efficiency  and correlation coefficient-CFS
+9 $ **************************************************
+9 CanE.leadT 280
+9 CanE.flagPo 1  ! select compute daily statistic, 1-yes  0-not 
+9 CanE.ObFile E:\师大项目\数字流域\Data\GEFS\19562012.txt   
+9 CanE.SiFile E:\师大项目\数字流域\Data\CFS\CFSPoint_prate\  
+9 CanE.ReFile E:\师大项目\数字流域\Data\CFS\re\
+9 CanE.DoFile E:\EPP4\Program\obw.asc
+9 CanE.minwin  0 31
+9 CanE.maxwin  0 61
+9 CanE.x1   1   
+9 CanE.x2   1   
+9 CanE.y1   1  
+9 CanE.y2   11  
+9 CanE.BeginYear 1982
+9 CanE.EndYear 2009
+9 CanE.Events 23
+9 CanE.nparint 5  !interval of calculation in 365 days
+9 CanE.Estart $please write CanE.Events timing in next line
+9  1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 
+9 CanE.Estop $please write CanE.Events timing in next line
+9  1 2 3 4 5 6 7 8 9 10 11 12 13 14 31 61 92 122 153 183 214 244 280
+
+10 $ **************************************************
+10 $ 10.from historical observed data and forecast to get parameter of EPP model
+10 $ for CFS+GFS
+10 $ **************************************************
+10 CanE.leadT 30   CFS
+10 CanE.leadT1 8  GFS
+10 CanE.ObFile  E:\师大项目\数字流域\Data\P19572009.txt   
+10 CanE.SiFile  E:\师大项目\数字流域\Data\GEFS\ 
+10 CanE.SiFile1 E:\师大项目\数字流域\Data\CFS\CFSPoint_prate\ 
+10 CanE.ReFile  E:\师大项目\数字流域\Data\GFSCFS\Para\  
+10 CanE.DoFile  E:\师大项目\数字流域\Data\CFS\obw.asc
+10 CanE.minwin   31
+10 CanE.maxwin   61
+
+10 CanE.BeginYear  1985 
+
+10 CanE.EndYear    2008 
+10 CanE.x1  1  
+10 CanE.x2  1  
+10 CanE.y1  1    
+10 CanE.y2  76 11  
+10 CanE.nparint  5  !interval of calculation in 365 days for read data
+10 CanE.Events  15 23 14
+10 CanE.Estart $please write CanE.Events timing in next line
+10 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+10 $ 1 2 3 4 5 6 7 8 9 11 15 19 23 27 31 61 91 121 151 181 211 241 271
+
+10 CanE.Estop $please write CanE.Events timing in next line
+10   1 2 3 4 5 6 7 8 9 10 14 18 22 26 30 60 90 120 150 180 210 240 270 280
+
+10 $ 1 2 3 4 5 6 7 9 11 14 21 27 34 45
+10 $1 2 3 4 5 6 7 7 14 14 21 21 28 28 60 60 90 90 120 120 150 150 280
+
+10 CanE.flagCG 1  !select read GFS data, 1-yes  0-not 
+10 CanE.flagT 0  !select read temperature data, 0-Precipitation  1-Tmax  2-Tmin
+
+10 CanE.minall 150   !minimum number of all data 150
+10 CanE.minpos 50    !minimum number of data > pthresh_fcst 50
+10 CanE.pop_fraction  0.97   !fraction of total precip > 0
+10 CanE.iobstran 1 4      ! observations probability distribution
+10 CanE.ifcsttran 1 4     ! forecast probability distribution  
+10 $ !  probability distribution
+10 $ ! 0  no  transformation   1 GAMM = Gamma
+10 $ ! 2 LOGN = Log Normal     3 EXPO = Exponetial
+10 $ ! 4  normal  distribution 5 WEIB = Weibull
+10 CanE.iopt_rho 1      ! correlation coefficient selection  
+10 CanE.cor_weight 0.5 
+10 CanE.cavgobsx 50.8   ! maximum conditional mean precipitation value (mm/6hr)50.8
+10 CanE.cavgfcstx 50.8  ! maximum conditional mean precipitation value (mm/6hr)50.8
+10 CanE.verstats  0  !1-check calibration 0-no checkl
+10 CanE.nems  30  !  number of ensemble members 
+
+11 $ **************************************************
+11 $ 11.hindcast with EPP parameter
+11 $ **************************************************
+
+11 epp1.leadT1 8
+11 epp1.leadT  30
+11 epp1.nparint 5  !interval of calculation in 365 days
+11 epp1.nparint1 5  !interval of calculation in 365 days
+11 epp1.flagCG 1  !select read GFS data, 1-yes  0-not 
+11 epp1.flagT 0  !select read temperature data, 0-Precipitation  1-Tmax  2-Tmin
+11 epp1.x1  1    330 322 141 1   141 464  458 
+11 epp1.x2  1    331 331 141 3   141 464  458  
+11 epp1.y1  1  47  55  1   55  162  178 
+11 epp1.y2  76  70  55  224 55  162  178 
+11 epp1.EpFile  E:\师大项目\数字流域\Data\P19572009.txt 
+11 epp1.ObFile  E:\师大项目\数字流域\Data\P19572009.txt 
+11 epp1.SiFile  E:\师大项目\数字流域\Data\GEFS\      
+11 epp1.SiFile1 E:\师大项目\数字流域\Data\CFS\CFSPoint_prate\     
+11 epp1.PaFile E:\师大项目\数字流域\Data\GFSCFS\Para\    
+11 epp1.DoFile  E:\师大项目\数字流域\Data\CFS\obw.asc
+11 epp1.ReFile  E:\师大项目\数字流域\Data\GFSCFS\Hindcast\     
+11 epp1.BeginYear 1985
+11 epp1.EndYear   2008
+11 epp1.BeginYearEns 1985
+11 epp1.EndYearEns 2008
+11 epp1.Events 15 23
+11 epp1.Estart $please write CanE.Events timing in next line
+11  1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+11 $ 1 2 3 4 5 6 7 8 9 11 15 19 23 27 31 61 91 121 151 181 211 241 271
+11 $ 1 2 3 4 5 6 7 8 10 12 15 21 28 35
+11 $ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 15 15 15 15 15 15 15 15 15  
+11 epp1.Estop $please write CanE.Events timing in next line
+11   1 2 3 4 5 6 7 8 9 10 14 18 22 26 30 60 90 120 150 180 210 240 270 280
+11 $  1 2 3 4 5 6 7 9 11 14 21 27 34 45
+11 $ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 31 61 92 122 153 183 214 244 280
+  
+11 epp1.iobstran  1      ! observations probability distribution
+11 epp1.ifcsttran  1     ! forecast probability distribution  
+ 
+ 
+
+12 $ **************************************************
+12 $ 12.CFS members correlation
+12 $ **************************************************
+ 
+12 CFSData3.DFile E:\EPP4\DATA\CFSUSA_P 
+12 CFSData3.MName E:\EPP4\Program\obw.asc
+12 CFSData3.OutFile E:\EPP4\DATA\Para\CFS4R\
+12 CFSData3.ObFile E:\EPP4\DATA\Usa6HourP\  
+12 CFSData3.leadT 280
+12 CFSData3.BeginYear 1982
+12 CFSData3.EndYear 1982
+12 CFSData3.ifile  21
+12 CFSData3.EName  prate 
+12 CFSData3.x1   3 141 458 
+12 CFSData3.x2   3 464  141 458  
+12 CFSData3.y1  186 55 178 
+12 CFSData3.y2  186 55 178 
+
+
+13 $ **************************************************
+13 $ 13.CFS operational
+13 $ **************************************************
+13 CFSData4.CFile E:\EPP4\DATA\CFSlonlat.txt
+13 CFSData4.DFile I:\CFSoperation\cfs
+13 CFSData4.WFile E:\EPP4\DATA\wCfs
+13 CFSData4.MName E:\EPP4\Program\obw.asc
+13 CFSData4.OutFile I:\CFSoperation\USA
+13 CFSData4.EName prate tmp2m 
+13 CFSData4.leadT  280  45 
+13 CFSData4.ifile  22
+13 CFSData4.iYear  2012
+13 CFSData4.imonth 7
+13 CFSData4.iday   2
+13 CFSData4.ihour 0
+13 CFSData4.ensm  1
+
+13 epp2.leadT1 14
+13 epp2.leadT  280 45
+13 epp2.nparint 1 5  !interval of calculation in 365 days
+13 epp2.flagCG 0  !select read GFS data, 1-yes  0-not 
+13 epp2.flagT 0 1 !select read temperature data, 0-Precipitation  1-Tmax  2-Tmin
+13 epp2.x1  1      330 322 141 1   141 464  458 
+13 epp2.x2  464    331 331 141 3   141 464  458  
+13 epp2.y1  1  47  55  1   55  162  178 
+13 epp2.y2  224  70  55  224 55  162  178 
+13 epp2.EpFile E:\EPP4\DATA\Usa6HourP\  
+13 epp2.ObFile E:\EPP4\DATA\Usa6HourP\     
+13 epp2.PaFile I:\CFSoperation\CFSEP280  
+13 epp2.ReFile  I:\CFSoperation\USA   
+ 
+13 epp2.BeginYearEns 1982
+13 epp2.EndYearEns 2001
+13 epp2.Events 23  14
+13 epp2.Estart $please write CanE.Events timing in next line
+13    1 2 3 4 5 6 7 8 9 11 15 19 23 27 31 61 91 121 151 181 211 241 271
+13 $   1 2 3 4 5 6 7 8 10 12 15 21 28 35   
+13 $ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 15 15 15 15 15 15 15 15 15  
+13 epp2.Estop $please write CanE.Events timing in next line
+13     1 2 3 4 5 6 7 9 10 14 18 22 26 30 60 90 120 150 180 210 240 270 280
+13 $    1 2 3 4 5 6 7 9 11 14 21 27 34 45
+13 $ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 31 61 92 122 153 183 214 244 280
+  
+13 epp2.iobstran  1 4     ! observations probability distribution
+13 epp2.ifcsttran  1 4     ! forecast probability distribution  
+ 
+14 !***************************************************************************************************** 
+14 !14. get sub-domain MASK file 
+14 !China province mask
+14 !
+14 !***************************************************************************************************** 
+
+14 CFSData5.CFile E:\EPP4\DATA\CFSlonlat.txt
+14 CFSData5.MName     E:\EPP4\DATA\chinabasin17-1d.asc
+14 CFSData5.WFile E:\EPP4\DATA\chinabasin17Mask.txt
+
+14 $CFSData5.CFile E:\EPP4\DATA\CFSlonlat.txt
+14 $CFSData5.MName E:\EPP4\DATA\province.asc
+14 $CFSData5.WFile E:\EPP4\DATA\CProvinceMask.txt
+
+15 $ **************************************************
+15 $ 15（21）.from historical observed data and forecast to get parameter of EPP model
+15 $ for CFS+GFS
+15 $ **************************************************
+
+15 CanE.leadT 8 
+15 CanE.leadT1 8  GFS  !for CFS OR GFS？ ask by Li
+15 CanE.ObFile  D:\EPP-daily-test_Huai19852014-b\Obs_19852014_EPP4input.txt
+15 CanE.SiFile  D:\EPP-daily-test_Huai19852014-b\outnew1\ 
+15 CanE.SiFile1 D:\EPP-daily-test_Huai19852014-b\outnew1\     
+15 CanE.ReFile  D:\EPP-daily-test_Huai19852014-b\Para\   
+ 
+15 CanE.minwin   31
+15 CanE.maxwin   61
+
+15 CanE.BeginYear  1985
+15 CanE.EndYear    2004
+15 CanE.x1  1  
+15 CanE.x2  1
+15 CanE.y1  1    
+15 CanE.y2  6
+15 CanE.nparint  1  !interval of calculation in 365 days for read data
+15 CanE.Events  8
+15 CanE.Estart   $please write CanE.Events timing in next line
+15  1 2 3 4 5 6 7 8 
+15 $ 1 1 1 1 1 1 1 1   			!? changed by li
+15 $ -2 -2 -2 -2 -2 -2 -2 -2 -2 -2 -2 -2 -2 -2
+15 $ -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+15 $ 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+
+15 CanE.Estop    $please write CanE.Events timing in next line
+15   1 2 3 4 5 6 7 8  			!? changed by li
+
+15 CanE.flagCG 0  !select read GFS data, 1-yes  0-not 
+15 CanE.flagT 0  !select read temperature data, 0-Precipitation  1-Tmax  2-Tmin
+
+15 CanE.minall 150   !minimum number of all data 150
+15 CanE.minpos 50    !minimum number of data > pthresh_fcst 50
+15 CanE.pop_fraction  0.99   !fraction of total precip > 0
+15 CanE.iobstran  1 4      ! observations probability distribution
+15 CanE.ifcsttran 1 4     ! forecast probability distribution  
+15 $ !  probability distribution
+15 $ ! 0  no  transformation   1 GAMM = Gamma
+15 $ ! 2 LOGN = Log Normal     3 EXPO = Exponetial
+15 $ ! 4  normal  distribution 5 WEIB = Weibull
+15 CanE.iopt_rho 1      ! correlation coefficient selection  
+15 CanE.cor_weight 0.5 
+15 CanE.cavgobsx 150.8   ! maximum conditional mean precipitation value (mm/6hr)50.8
+15 CanE.cavgfcstx 150.8  ! maximum conditional mean precipitation value (mm/6hr)50.8
+15 CanE.verstats  0  !1-check calibration 0-no checkl
+15 CanE.nems  20  !  number of ensemble members 
+ 
+
+
+18 $ **************************************************
+18 $ 18.GFS operational
+18 $ **************************************************
+
+
+18 epp3.iYear  2007
+18 epp3.imonth 6
+18 epp3.iday   30 
+18 epp3.EName prate tmp2m 
+18 epp3.leadT1 14
+18 epp3.leadT  14
+18 epp3.nparint 1 5  !interval of calculation in 365 days
+ 
+18 epp3.flagT 0 1 !select read temperature data, 0-Precipitation  1-Tmax  2-Tmin
+18 epp3.x1  1     
+18 epp3.x2  1     
+18 epp3.y1  1
+18 epp3.y2  15
+
+18 epp3.SiFile  E:\EPP4\EPPSystem\data\Forecast\
+18 epp3.EpFile  E:\EPP4\EPPSystem\data\OBS\ 
+18 epp3.ObFile  E:\EPP4\EPPSystem\data\OBS\    
+18 epp3.PaFile  E:\EPP4\EPPSystem\data\Para\  
+18 epp3.ReFile  E:\EPP4\EPPSystem\data\Forecast\
+ 
+18 epp3.BeginYearEns 1989
+18 epp3.EndYearEns 2008
+18 epp3.Events 14
+18 epp3.Estart $please write CanE.Events timing in next line
+18   1 1 1 1 1 1 1 1 1 1 1 1 1 1
+18 $  1 2 3 4 5 6 7 8 9 10 11 12 13 14 
+
+18 epp3.Estop $please write CanE.Events timing in next line
+18   1 2 3 4 5 6 7 8 9 10 11 12 13 14 
+  
+18 epp3.iobstran  1       ! observations probability distribution
+18 epp3.ifcsttran 1       ! forecast probability distribution  
+
+
+19 $ **************************************************
+19 $ 19.hindcast with EPP parameter
+19 $ **************************************************
+
+19 epp.leadT 8
+
+19 epp.EpFile D:\EPP-daily-test_Huai19852014-b\Obs_19852014_EPP4input.txt  
+19 epp.ObFile D:\EPP-daily-test_Huai19852014-b\Obs_19852014_EPP4input.txt 
+19 epp.SiFile D:\EPP-daily-test_Huai19852014-b\outnew1\   
+19 epp.PaFile D:\EPP-daily-test_Huai19852014-b\Para\   
+19 epp.ReFile D:\EPP-daily-test_Huai19852014-b\Hindcast1\     !change here
+
+19 epp.BeginYear 1985
+19 epp.EndYear 2014
+19 epp.BeginYearEns 1985
+19 epp.EndYearEns  2014
+
+19 epp.x1  1  
+19 epp.x2  1
+19 epp.y1  1      
+19 epp.y2  6  
+
+19 epp.Events 8
+19 epp.Estart $please write CanE.Events timing in next line
+19 1 2 3 4 5 6 7 8 
+19 $1 1 1 1 1 1 1 1  
+19 $-1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+19 $  1 1 1 1 1 1 1 1 1 1 1 1 1 1   
+19 $  1 2 3 4 5 6 7 8 9 10 11 12 13 14  
+
+19 epp.Estop $please write CanE.Events timing in next line
+19 1 2 3 4 5 6 7 8  
+  
+19 epp.iobstran 1      ! observations probability distribution
+19 epp.ifcsttran 1     ! forecast probability distribution  
+ 
+19 epp.nems  25  !  number of ensemble members 
+
+
+
+20 $ **************************************************
+20 $ 20.GFS data merge from Global data to study domain
+20 $ **************************************************
+20 CFSData1.CFile D:\precipitation\jwd\GFSlonlatBJ_172.txt
+20 CFSData1.DFile E:\GlobalGEFSMean
+  
+20 CFSData1.OutFile I:\EPP-daily-test\outnew1
+20 CFSData1.EName  prate  
+20 CFSData1.leadT  8
+20 CFSData1.BeginYear     2008
+20 CFSData1.EndYear       2011
+20 CFSData1.imonth 12
+20 CFSData1.iday   31
+20 CFSData1.ifile  22
+20 CFSData1.ihour  0 30
+
+
+21 $ **************************************************
+21 $ 21.from historical observed data and forecast to get parameter of EPP model
+21 $ for CFS+GFS
+21 $ **************************************************
+
+21 CanE.leadT 8 
+21 CanE.leadT1 7  GFS
+21 CanE.ObFile  E:\师大项目\数字流域\Data\GEFS\19562012.txt  
+21 $CanE.ObFile  E:\师大项目\集合预报\GFSFeilaixia\Para\obs.txt
+21 CanE.SiFile  E:\师大项目\数字流域\Data\GEFS\   
+21 CanE.SiFile1 E:\师大项目\数字流域\Data\GEFS\   
+21 CanE.ReFile  E:\师大项目\数字流域\Data\GEFS\Para\   
+ 
+21 CanE.minwin   31
+21 CanE.maxwin   61
+
+21 CanE.BeginYear  1986 
+21 CanE.EndYear    2011 
+21 CanE.x1  1  
+21 CanE.x2  1
+21 CanE.y1  1    
+21 CanE.y2  1 11
+21 CanE.nparint  1  !interval of calculation in 365 days for read data
+21 CanE.Events  8
+21 CanE.Estart   $please write CanE.Events timing in next line
+21  1   2 3 4 5 6 7 8 9 10 11 12 13 14 
+21 $   1 1 1 1 1 1 1 1 1 1 1 1 1 1
+
+21 CanE.Estop    $please write CanE.Events timing in next line
+21   1   2 3 4 5 6 7 8 9 10 11 12 13 14 
+
+21 CanE.flagCG 0  !select read GFS data, 1-yes  0-not 
+21 CanE.flagT 0  !select read temperature data, 0-Precipitation  1-Tmax  2-Tmin
+
+21 CanE.minall 150   !minimum number of all data 150
+21 CanE.minpos 50    !minimum number of data > pthresh_fcst 50
+21 CanE.pop_fraction  0.97   !fraction of total precip > 0
+21 CanE.iobstran  1 4      ! observations probability distribution
+21 CanE.ifcsttran 1 4     ! forecast probability distribution  
+21 $ !  probability distribution
+21 $ ! 0  no  transformation   1 GAMM = Gamma
+21 $ ! 2 LOGN = Log Normal     3 EXPO = Exponetial
+21 $ ! 4  normal  distribution 5 WEIB = Weibull
+21 CanE.iopt_rho 1      ! correlation coefficient selection  
+21 CanE.cor_weight 0.5 
+21 CanE.cavgobsx 150.8   ! maximum conditional mean precipitation value (mm/6hr)50.8
+21 CanE.cavgfcstx 150.8  ! maximum conditional mean precipitation value (mm/6hr)50.8
+21 CanE.verstats  0  !1-check calibration 0-no checkl
+21 CanE.nems  20  !  number of ensemble members 
+ 

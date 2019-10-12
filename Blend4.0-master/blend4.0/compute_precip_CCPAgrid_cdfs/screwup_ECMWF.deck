@@ -1,0 +1,10 @@
+#!/bin/tcsh
+
+
+python compute_precip_CCPAgrid_cdfs.py ECMWF 24 2016021000
+python compute_precip_CCPAgrid_cdfs.py ECMWF 48 2016021000
+python compute_precip_CCPAgrid_cdfs.py ECMWF 72 2016021000
+python compute_precip_CCPAgrid_cdfs.py ECMWF 96 2016021000
+python compute_precip_CCPAgrid_cdfs.py ECMWF 120 2016021000
+python compute_precip_CCPAgrid_cdfs.py ECMWF 144 2016021000
+python compute_precip_CCPAgrid_cdfs.py ECMWF 168 2016021000

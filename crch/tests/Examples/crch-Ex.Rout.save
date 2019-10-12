@@ -1,0 +1,482 @@
+
+R version 3.4.0 (2017-04-21) -- "You Stupid Darkness"
+Copyright (C) 2017 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> pkgname <- "crch"
+> source(file.path(R.home("share"), "R", "examples-header.R"))
+> options(warn = 1)
+> library('crch')
+> 
+> base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
+> cleanEx()
+> nameEx("RainIbk")
+> ### * RainIbk
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: RainIbk
+> ### Title: Precipitation Observations and Forecasts for Innsbruck
+> ### Aliases: RainIbk
+> ### Keywords: datasets
+> 
+> ### ** Examples
+> 
+> ## Spread skill relationship ##
+> 
+> ## load and prepare data
+> data(RainIbk)
+> 
+> ## mean and standard deviation of square root transformed ensemble forecasts
+> RainIbk$sqrtensmean <- 
++   apply(sqrt(RainIbk[,grep('^rainfc',names(RainIbk))]), 1, mean)
+> RainIbk$sqrtenssd <- 
++   apply(sqrt(RainIbk[,grep('^rainfc',names(RainIbk))]),  1, sd)
+> 
+> ## quintiles of sqrtenssd
+> sdcat <- cut(RainIbk$sqrtenssd, c(-Inf, quantile(RainIbk$sqrtenssd, 
++   seq(0.2,0.8,0.2)), Inf), labels = c(1:5))
+> 
+> ## mean forecast errors for each quintile
+> m <- NULL
+> for(i in levels(sdcat)) {
++   m <- c(m, mean((sqrt(RainIbk$rain)[sdcat == i] -
++   RainIbk$sqrtensmean[sdcat == i])^2, na.rm = TRUE))
++ }
+> 
+> ## plot
+> boxplot((sqrt(rain) - sqrtensmean)^2~sdcat, RainIbk, 
++   xlab = "Quintile of ensemble standard deviation", 
++   ylab = "mean squared error", main = "Spread skill relationship")
+> 
+> 
+> 
+> 
+> cleanEx()
+> nameEx("crch")
+> ### * crch
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: crch
+> ### Title: Censored Regression with Conditional Heteroscedasticy
+> ### Aliases: crch trch crch.fit
+> ### Keywords: regression
+> 
+> ### ** Examples
+> 
+> data("RainIbk")
+> ## mean and standard deviation of square root transformed ensemble forecasts
+> RainIbk$sqrtensmean <- 
++   apply(sqrt(RainIbk[,grep('^rainfc',names(RainIbk))]), 1, mean)
+> RainIbk$sqrtenssd <- 
++   apply(sqrt(RainIbk[,grep('^rainfc',names(RainIbk))]), 1, sd)
+> 
+> ## fit linear regression model with Gaussian distribution 
+> CRCH <- crch(sqrt(rain) ~ sqrtensmean, data = RainIbk, dist = "gaussian")
+> ## same as lm?
+> all.equal(coef(lm(sqrt(rain) ~ sqrtensmean, data = RainIbk)),
++   head(coef(CRCH), -1))
+[1] TRUE
+> 
+> ## print
+> CRCH
+
+Call:
+crch(formula = sqrt(rain) ~ sqrtensmean, data = RainIbk, dist = "gaussian")
+
+Coefficients (location model):
+(Intercept)  sqrtensmean  
+     0.1468       0.5817  
+
+Coefficients (scale model with log link):
+(Intercept)  
+     0.4945  
+
+Distribution: gaussian
+
+> ## summary
+> summary(CRCH)
+
+Call:
+crch(formula = sqrt(rain) ~ sqrtensmean, data = RainIbk, dist = "gaussian")
+
+Standardized residuals:
+    Min      1Q  Median      3Q     Max 
+-2.4256 -0.7120 -0.1562  0.5786  4.8408 
+
+Coefficients (location model):
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  0.14683    0.05456   2.691  0.00713 ** 
+sqrtensmean  0.58173    0.01540  37.781  < 2e-16 ***
+
+Coefficients (scale model with log link):
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  0.49454    0.01003   49.31   <2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+
+Distribution: gaussian
+Log-likelihood: -9512 on 3 Df
+Number of iterations in BFGS optimization: 3 
+> 
+> ## left censored regression model with censoring point 0:
+> CRCH2 <- crch(sqrt(rain) ~ sqrtensmean, data = RainIbk, 
++   dist = "gaussian", left = 0)
+> 
+> ## left censored regression model with censoring point 0 and 
+> ## conditional heteroscedasticy:
+> CRCH3 <- crch(sqrt(rain) ~ sqrtensmean|sqrtenssd, data = RainIbk, 
++   dist = "gaussian",  left = 0)
+> 
+> ## left censored regression model with censoring point 0 and 
+> ## conditional heteroscedasticy with logistic distribution:
+> CRCH4 <- crch(sqrt(rain) ~ sqrtensmean|sqrtenssd, data = RainIbk, 
++   dist = "logistic", left = 0)
+> 
+> ## compare AIC 
+> AIC(CRCH, CRCH2, CRCH3, CRCH4)
+      df      AIC
+CRCH   3 19029.75
+CRCH2  3 17961.76
+CRCH3  4 17914.41
+CRCH4  4 17867.35
+> 
+> 
+> 
+> cleanEx()
+> nameEx("crch.boost")
+> ### * crch.boost
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: crch.boost
+> ### Title: Auxiliary functions to fit 'crch' models via boosting.
+> ### Aliases: crch.boost crch.boost.fit
+> ### Keywords: regression, boosting
+> 
+> ### ** Examples
+> 
+> # generate data
+> suppressWarnings(RNGversion("3.5.0"))
+> set.seed(5)
+> x <- matrix(rnorm(1000*20),1000,20)
+> y <- rnorm(1000, 1 + x[,1] - 1.5 * x[,2], exp(-1 + 0.3*x[,3]))
+> y <- pmax(0, y)
+> data <- data.frame(cbind(y, x))
+> 
+> # fit model with maximum likelihood
+> CRCH <- crch(y ~ .|., data = data, dist = "gaussian", left = 0)
+> 
+> # fit model with boosting
+> boost <- crch(y ~ .|.,  data = data, dist = "gaussian", left = 0,
++   control = crch.boost(mstop = "aic"))
+> 
+> # more conveniently, the same model can also be fit through
+> # boost <- crch(y ~ .|.,  data = data, dist = "gaussian", left = 0,
+> #   method = "boosting", mstop = "aic")
+> 
+> # AIC comparison
+> AIC(CRCH, boost)
+      df      AIC
+CRCH  42 819.2673
+boost  7 782.1219
+> 
+> # summary
+> summary(boost)
+
+Call:
+crch(formula = y ~ . | ., data = data, dist = "gaussian", left = 0, control = crch.boost(mstop = "aic"))
+
+Standardized residuals:
+    Min      1Q  Median      3Q     Max 
+-2.9273 -0.2963  0.5462  1.4357 22.6650 
+
+maximum stopping iteration: 100 
+
+optimum stopping iterations:
+max aic bic 
+100  90  90 
+
+Non-zero coefficients after 90 boosting iterations:
+Location model:
+(Intercept)           V2           V3          V13          V21  
+    0.99111      1.01795     -1.49731      0.04483      0.03668  
+
+Scale model with log link:
+(Intercept)           V4  
+    -0.9183       0.2226  
+
+Distribution: gaussian
+Log-likelihood: -384.1 on 7 Df
+
+> 
+> # plot
+> plot(boost)
+> 
+> 
+> 
+> cleanEx()
+> nameEx("crch.stabsel")
+> ### * crch.stabsel
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: crch.stabsel
+> ### Title: Auxiliary functions to perform stability selection using
+> ###   boosting.
+> ### Aliases: crch.stabsel
+> ### Keywords: regression
+> 
+> ### ** Examples
+> 
+> # generate data
+> suppressWarnings(RNGversion("3.5.0"))
+> set.seed(5)
+> x <- matrix(rnorm(1000*20),1000,20)
+> y <- rnorm(1000, 1 + x[,1] - 1.5 * x[,2], exp(-1 + 0.3*x[,3]))
+> y <- pmax(0, y)
+> data <- data.frame(cbind(y, x))
+> 
+> # fit model with maximum likelihood
+> CRCH1 <- crch(y ~ .|., data = data, dist = "gaussian", left = 0)
+> 
+> # Perform stability selection
+> stabsel <- crch.stabsel(y ~ .|.,  data = data, dist = "gaussian", left = 0,
++            q = 8, B = 5)
+Iteration 1/2000 parameters added 1/42Iteration 2/2000 parameters added 1/42Iteration 3/2000 parameters added 1/42Iteration 4/2000 parameters added 1/42Iteration 5/2000 parameters added 1/42Iteration 6/2000 parameters added 2/42Iteration 7/2000 parameters added 2/42Iteration 8/2000 parameters added 2/42Iteration 9/2000 parameters added 2/42Iteration 10/2000 parameters added 2/42Iteration 11/2000 parameters added 2/42Iteration 12/2000 parameters added 2/42Iteration 13/2000 parameters added 2/42Iteration 14/2000 parameters added 2/42Iteration 15/2000 parameters added 2/42Iteration 16/2000 parameters added 2/42Iteration 17/2000 parameters added 2/42Iteration 18/2000 parameters added 2/42Iteration 19/2000 parameters added 2/42Iteration 20/2000 parameters added 2/42Iteration 21/2000 parameters added 2/42Iteration 22/2000 parameters added 2/42Iteration 23/2000 parameters added 2/42Iteration 24/2000 parameters added 2/42Iteration 25/2000 parameters added 2/42Iteration 26/2000 parameters added 2/42Iteration 27/2000 parameters added 2/42Iteration 28/2000 parameters added 2/42Iteration 29/2000 parameters added 2/42Iteration 30/2000 parameters added 2/42Iteration 31/2000 parameters added 2/42Iteration 32/2000 parameters added 2/42Iteration 33/2000 parameters added 2/42Iteration 34/2000 parameters added 2/42Iteration 35/2000 parameters added 2/42Iteration 36/2000 parameters added 2/42Iteration 37/2000 parameters added 2/42Iteration 38/2000 parameters added 2/42Iteration 39/2000 parameters added 2/42Iteration 40/2000 parameters added 2/42Iteration 41/2000 parameters added 2/42Iteration 42/2000 parameters added 2/42Iteration 43/2000 parameters added 2/42Iteration 44/2000 parameters added 2/42Iteration 45/2000 parameters added 2/42Iteration 46/2000 parameters added 2/42Iteration 47/2000 parameters added 2/42Iteration 48/2000 parameters added 2/42Iteration 49/2000 parameters added 2/42Iteration 50/2000 parameters added 2/42Iteration 51/2000 parameters added 2/42Iteration 52/2000 parameters added 3/42Iteration 53/2000 parameters added 3/42Iteration 54/2000 parameters added 3/42Iteration 55/2000 parameters added 3/42Iteration 56/2000 parameters added 3/42Iteration 57/2000 parameters added 3/42Iteration 58/2000 parameters added 3/42Iteration 59/2000 parameters added 4/42Iteration 60/2000 parameters added 4/42Iteration 61/2000 parameters added 4/42Iteration 62/2000 parameters added 4/42Iteration 63/2000 parameters added 4/42Iteration 64/2000 parameters added 4/42Iteration 65/2000 parameters added 4/42Iteration 66/2000 parameters added 4/42Iteration 67/2000 parameters added 4/42Iteration 68/2000 parameters added 4/42Iteration 69/2000 parameters added 4/42Iteration 70/2000 parameters added 4/42Iteration 71/2000 parameters added 5/42Iteration 72/2000 parameters added 5/42Iteration 73/2000 parameters added 5/42Iteration 74/2000 parameters added 5/42Iteration 75/2000 parameters added 5/42Iteration 76/2000 parameters added 5/42Iteration 77/2000 parameters added 6/42Iteration 78/2000 parameters added 6/42Iteration 79/2000 parameters added 6/42Iteration 80/2000 parameters added 6/42Iteration 81/2000 parameters added 7/42Iteration 82/2000 parameters added 7/42Iteration 83/2000 parameters added 7/42Iteration 84/2000 parameters added 8/42
+Iteration 1/2000 parameters added 1/42Iteration 2/2000 parameters added 1/42Iteration 3/2000 parameters added 1/42Iteration 4/2000 parameters added 1/42Iteration 5/2000 parameters added 2/42Iteration 6/2000 parameters added 2/42Iteration 7/2000 parameters added 2/42Iteration 8/2000 parameters added 2/42Iteration 9/2000 parameters added 2/42Iteration 10/2000 parameters added 2/42Iteration 11/2000 parameters added 2/42Iteration 12/2000 parameters added 2/42Iteration 13/2000 parameters added 2/42Iteration 14/2000 parameters added 2/42Iteration 15/2000 parameters added 2/42Iteration 16/2000 parameters added 2/42Iteration 17/2000 parameters added 2/42Iteration 18/2000 parameters added 2/42Iteration 19/2000 parameters added 2/42Iteration 20/2000 parameters added 2/42Iteration 21/2000 parameters added 2/42Iteration 22/2000 parameters added 2/42Iteration 23/2000 parameters added 2/42Iteration 24/2000 parameters added 2/42Iteration 25/2000 parameters added 2/42Iteration 26/2000 parameters added 2/42Iteration 27/2000 parameters added 2/42Iteration 28/2000 parameters added 2/42Iteration 29/2000 parameters added 2/42Iteration 30/2000 parameters added 2/42Iteration 31/2000 parameters added 2/42Iteration 32/2000 parameters added 2/42Iteration 33/2000 parameters added 2/42Iteration 34/2000 parameters added 2/42Iteration 35/2000 parameters added 2/42Iteration 36/2000 parameters added 2/42Iteration 37/2000 parameters added 2/42Iteration 38/2000 parameters added 2/42Iteration 39/2000 parameters added 2/42Iteration 40/2000 parameters added 2/42Iteration 41/2000 parameters added 2/42Iteration 42/2000 parameters added 2/42Iteration 43/2000 parameters added 2/42Iteration 44/2000 parameters added 2/42Iteration 45/2000 parameters added 2/42Iteration 46/2000 parameters added 2/42Iteration 47/2000 parameters added 2/42Iteration 48/2000 parameters added 2/42Iteration 49/2000 parameters added 2/42Iteration 50/2000 parameters added 2/42Iteration 51/2000 parameters added 2/42Iteration 52/2000 parameters added 2/42Iteration 53/2000 parameters added 2/42Iteration 54/2000 parameters added 2/42Iteration 55/2000 parameters added 3/42Iteration 56/2000 parameters added 3/42Iteration 57/2000 parameters added 3/42Iteration 58/2000 parameters added 3/42Iteration 59/2000 parameters added 3/42Iteration 60/2000 parameters added 3/42Iteration 61/2000 parameters added 3/42Iteration 62/2000 parameters added 3/42Iteration 63/2000 parameters added 3/42Iteration 64/2000 parameters added 3/42Iteration 65/2000 parameters added 3/42Iteration 66/2000 parameters added 3/42Iteration 67/2000 parameters added 4/42Iteration 68/2000 parameters added 4/42Iteration 69/2000 parameters added 4/42Iteration 70/2000 parameters added 5/42Iteration 71/2000 parameters added 5/42Iteration 72/2000 parameters added 5/42Iteration 73/2000 parameters added 5/42Iteration 74/2000 parameters added 5/42Iteration 75/2000 parameters added 5/42Iteration 76/2000 parameters added 5/42Iteration 77/2000 parameters added 5/42Iteration 78/2000 parameters added 5/42Iteration 79/2000 parameters added 6/42Iteration 80/2000 parameters added 6/42Iteration 81/2000 parameters added 6/42Iteration 82/2000 parameters added 7/42Iteration 83/2000 parameters added 7/42Iteration 84/2000 parameters added 7/42Iteration 85/2000 parameters added 8/42
+Iteration 1/2000 parameters added 1/42Iteration 2/2000 parameters added 1/42Iteration 3/2000 parameters added 1/42Iteration 4/2000 parameters added 1/42Iteration 5/2000 parameters added 1/42Iteration 6/2000 parameters added 2/42Iteration 7/2000 parameters added 2/42Iteration 8/2000 parameters added 2/42Iteration 9/2000 parameters added 2/42Iteration 10/2000 parameters added 2/42Iteration 11/2000 parameters added 2/42Iteration 12/2000 parameters added 2/42Iteration 13/2000 parameters added 2/42Iteration 14/2000 parameters added 2/42Iteration 15/2000 parameters added 2/42Iteration 16/2000 parameters added 2/42Iteration 17/2000 parameters added 2/42Iteration 18/2000 parameters added 2/42Iteration 19/2000 parameters added 2/42Iteration 20/2000 parameters added 2/42Iteration 21/2000 parameters added 2/42Iteration 22/2000 parameters added 2/42Iteration 23/2000 parameters added 2/42Iteration 24/2000 parameters added 2/42Iteration 25/2000 parameters added 2/42Iteration 26/2000 parameters added 2/42Iteration 27/2000 parameters added 2/42Iteration 28/2000 parameters added 2/42Iteration 29/2000 parameters added 2/42Iteration 30/2000 parameters added 2/42Iteration 31/2000 parameters added 2/42Iteration 32/2000 parameters added 2/42Iteration 33/2000 parameters added 2/42Iteration 34/2000 parameters added 2/42Iteration 35/2000 parameters added 2/42Iteration 36/2000 parameters added 2/42Iteration 37/2000 parameters added 2/42Iteration 38/2000 parameters added 2/42Iteration 39/2000 parameters added 2/42Iteration 40/2000 parameters added 2/42Iteration 41/2000 parameters added 2/42Iteration 42/2000 parameters added 2/42Iteration 43/2000 parameters added 2/42Iteration 44/2000 parameters added 2/42Iteration 45/2000 parameters added 2/42Iteration 46/2000 parameters added 2/42Iteration 47/2000 parameters added 2/42Iteration 48/2000 parameters added 2/42Iteration 49/2000 parameters added 2/42Iteration 50/2000 parameters added 2/42Iteration 51/2000 parameters added 2/42Iteration 52/2000 parameters added 2/42Iteration 53/2000 parameters added 2/42Iteration 54/2000 parameters added 3/42Iteration 55/2000 parameters added 3/42Iteration 56/2000 parameters added 3/42Iteration 57/2000 parameters added 3/42Iteration 58/2000 parameters added 3/42Iteration 59/2000 parameters added 3/42Iteration 60/2000 parameters added 3/42Iteration 61/2000 parameters added 3/42Iteration 62/2000 parameters added 3/42Iteration 63/2000 parameters added 4/42Iteration 64/2000 parameters added 4/42Iteration 65/2000 parameters added 4/42Iteration 66/2000 parameters added 4/42Iteration 67/2000 parameters added 4/42Iteration 68/2000 parameters added 4/42Iteration 69/2000 parameters added 4/42Iteration 70/2000 parameters added 4/42Iteration 71/2000 parameters added 4/42Iteration 72/2000 parameters added 4/42Iteration 73/2000 parameters added 4/42Iteration 74/2000 parameters added 4/42Iteration 75/2000 parameters added 4/42Iteration 76/2000 parameters added 4/42Iteration 77/2000 parameters added 4/42Iteration 78/2000 parameters added 4/42Iteration 79/2000 parameters added 5/42Iteration 80/2000 parameters added 6/42Iteration 81/2000 parameters added 6/42Iteration 82/2000 parameters added 6/42Iteration 83/2000 parameters added 6/42Iteration 84/2000 parameters added 6/42Iteration 85/2000 parameters added 6/42Iteration 86/2000 parameters added 7/42Iteration 87/2000 parameters added 7/42Iteration 88/2000 parameters added 7/42Iteration 89/2000 parameters added 7/42Iteration 90/2000 parameters added 7/42Iteration 91/2000 parameters added 7/42Iteration 92/2000 parameters added 7/42Iteration 93/2000 parameters added 8/42
+Iteration 1/2000 parameters added 1/42Iteration 2/2000 parameters added 1/42Iteration 3/2000 parameters added 1/42Iteration 4/2000 parameters added 1/42Iteration 5/2000 parameters added 1/42Iteration 6/2000 parameters added 2/42Iteration 7/2000 parameters added 2/42Iteration 8/2000 parameters added 2/42Iteration 9/2000 parameters added 2/42Iteration 10/2000 parameters added 2/42Iteration 11/2000 parameters added 2/42Iteration 12/2000 parameters added 2/42Iteration 13/2000 parameters added 2/42Iteration 14/2000 parameters added 2/42Iteration 15/2000 parameters added 2/42Iteration 16/2000 parameters added 2/42Iteration 17/2000 parameters added 2/42Iteration 18/2000 parameters added 2/42Iteration 19/2000 parameters added 2/42Iteration 20/2000 parameters added 2/42Iteration 21/2000 parameters added 2/42Iteration 22/2000 parameters added 2/42Iteration 23/2000 parameters added 2/42Iteration 24/2000 parameters added 2/42Iteration 25/2000 parameters added 2/42Iteration 26/2000 parameters added 2/42Iteration 27/2000 parameters added 2/42Iteration 28/2000 parameters added 2/42Iteration 29/2000 parameters added 2/42Iteration 30/2000 parameters added 2/42Iteration 31/2000 parameters added 2/42Iteration 32/2000 parameters added 2/42Iteration 33/2000 parameters added 2/42Iteration 34/2000 parameters added 2/42Iteration 35/2000 parameters added 2/42Iteration 36/2000 parameters added 2/42Iteration 37/2000 parameters added 2/42Iteration 38/2000 parameters added 2/42Iteration 39/2000 parameters added 2/42Iteration 40/2000 parameters added 2/42Iteration 41/2000 parameters added 2/42Iteration 42/2000 parameters added 2/42Iteration 43/2000 parameters added 2/42Iteration 44/2000 parameters added 2/42Iteration 45/2000 parameters added 2/42Iteration 46/2000 parameters added 2/42Iteration 47/2000 parameters added 2/42Iteration 48/2000 parameters added 2/42Iteration 49/2000 parameters added 2/42Iteration 50/2000 parameters added 2/42Iteration 51/2000 parameters added 2/42Iteration 52/2000 parameters added 2/42Iteration 53/2000 parameters added 2/42Iteration 54/2000 parameters added 2/42Iteration 55/2000 parameters added 2/42Iteration 56/2000 parameters added 3/42Iteration 57/2000 parameters added 3/42Iteration 58/2000 parameters added 3/42Iteration 59/2000 parameters added 3/42Iteration 60/2000 parameters added 3/42Iteration 61/2000 parameters added 3/42Iteration 62/2000 parameters added 3/42Iteration 63/2000 parameters added 3/42Iteration 64/2000 parameters added 4/42Iteration 65/2000 parameters added 4/42Iteration 66/2000 parameters added 4/42Iteration 67/2000 parameters added 4/42Iteration 68/2000 parameters added 4/42Iteration 69/2000 parameters added 4/42Iteration 70/2000 parameters added 4/42Iteration 71/2000 parameters added 5/42Iteration 72/2000 parameters added 5/42Iteration 73/2000 parameters added 5/42Iteration 74/2000 parameters added 5/42Iteration 75/2000 parameters added 5/42Iteration 76/2000 parameters added 6/42Iteration 77/2000 parameters added 7/42Iteration 78/2000 parameters added 7/42Iteration 79/2000 parameters added 8/42
+Iteration 1/2000 parameters added 1/42Iteration 2/2000 parameters added 1/42Iteration 3/2000 parameters added 1/42Iteration 4/2000 parameters added 1/42Iteration 5/2000 parameters added 2/42Iteration 6/2000 parameters added 2/42Iteration 7/2000 parameters added 2/42Iteration 8/2000 parameters added 2/42Iteration 9/2000 parameters added 2/42Iteration 10/2000 parameters added 2/42Iteration 11/2000 parameters added 2/42Iteration 12/2000 parameters added 2/42Iteration 13/2000 parameters added 2/42Iteration 14/2000 parameters added 2/42Iteration 15/2000 parameters added 2/42Iteration 16/2000 parameters added 2/42Iteration 17/2000 parameters added 2/42Iteration 18/2000 parameters added 2/42Iteration 19/2000 parameters added 2/42Iteration 20/2000 parameters added 2/42Iteration 21/2000 parameters added 2/42Iteration 22/2000 parameters added 2/42Iteration 23/2000 parameters added 2/42Iteration 24/2000 parameters added 2/42Iteration 25/2000 parameters added 2/42Iteration 26/2000 parameters added 2/42Iteration 27/2000 parameters added 2/42Iteration 28/2000 parameters added 2/42Iteration 29/2000 parameters added 2/42Iteration 30/2000 parameters added 2/42Iteration 31/2000 parameters added 2/42Iteration 32/2000 parameters added 2/42Iteration 33/2000 parameters added 2/42Iteration 34/2000 parameters added 2/42Iteration 35/2000 parameters added 2/42Iteration 36/2000 parameters added 2/42Iteration 37/2000 parameters added 2/42Iteration 38/2000 parameters added 2/42Iteration 39/2000 parameters added 2/42Iteration 40/2000 parameters added 2/42Iteration 41/2000 parameters added 2/42Iteration 42/2000 parameters added 2/42Iteration 43/2000 parameters added 2/42Iteration 44/2000 parameters added 2/42Iteration 45/2000 parameters added 2/42Iteration 46/2000 parameters added 2/42Iteration 47/2000 parameters added 2/42Iteration 48/2000 parameters added 2/42Iteration 49/2000 parameters added 2/42Iteration 50/2000 parameters added 2/42Iteration 51/2000 parameters added 2/42Iteration 52/2000 parameters added 2/42Iteration 53/2000 parameters added 2/42Iteration 54/2000 parameters added 2/42Iteration 55/2000 parameters added 3/42Iteration 56/2000 parameters added 3/42Iteration 57/2000 parameters added 3/42Iteration 58/2000 parameters added 3/42Iteration 59/2000 parameters added 3/42Iteration 60/2000 parameters added 3/42Iteration 61/2000 parameters added 3/42Iteration 62/2000 parameters added 3/42Iteration 63/2000 parameters added 3/42Iteration 64/2000 parameters added 3/42Iteration 65/2000 parameters added 3/42Iteration 66/2000 parameters added 4/42Iteration 67/2000 parameters added 4/42Iteration 68/2000 parameters added 4/42Iteration 69/2000 parameters added 4/42Iteration 70/2000 parameters added 5/42Iteration 71/2000 parameters added 5/42Iteration 72/2000 parameters added 5/42Iteration 73/2000 parameters added 5/42Iteration 74/2000 parameters added 6/42Iteration 75/2000 parameters added 6/42Iteration 76/2000 parameters added 6/42Iteration 77/2000 parameters added 6/42Iteration 78/2000 parameters added 6/42Iteration 79/2000 parameters added 6/42Iteration 80/2000 parameters added 6/42Iteration 81/2000 parameters added 6/42Iteration 82/2000 parameters added 6/42Iteration 83/2000 parameters added 6/42Iteration 84/2000 parameters added 6/42Iteration 85/2000 parameters added 6/42Iteration 86/2000 parameters added 6/42Iteration 87/2000 parameters added 6/42Iteration 88/2000 parameters added 6/42Iteration 89/2000 parameters added 7/42Iteration 90/2000 parameters added 7/42Iteration 91/2000 parameters added 7/42Iteration 92/2000 parameters added 8/42
+> 
+> # Show stability selection summary
+> print(stabsel); plot(stabsel)
+
+  crch Stability Selection Info
+
+  Family information
+   Distribution:       gaussian
+   Truncated:          FALSE
+   Left-censoring:     0
+   Right-censoring:    Inf
+
+  Selection parameters
+   Number of parameters (q):         8
+   Number of iterations (B):         5
+   Selection threshold (thr):     0.90
+   Total number of parameter (p):   40
+
+  Per family error rate
+   Given p/q/thr the expected value of falsely
+   chosen parameters is:          2.00
+
+  Selected formula:
+   y ~ V2 + V3 | V4
+<environment: 0x4cf8c48>
+> 
+> CRCH2 <- crch(stabsel$formula.new, data = data, dist = "gaussian", left = 0 )
+> BOOST <- crch(stabsel$formula.new, data = data, dist = "gaussian", left = 0,
++               control = crch.boost() )
+> 
+> ### AIC comparison
+> sapply( list(CRCH1,CRCH2,BOOST), logLik )
+[1] -367.6337 -384.2485 -385.0090
+> 
+> 
+> 
+> cleanEx()
+> nameEx("hxlr")
+> ### * hxlr
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: hxlr
+> ### Title: Heteroscedastic Extended Logistic Regression
+> ### Aliases: hxlr
+> ### Keywords: regression
+> 
+> ### ** Examples
+> 
+> data("RainIbk")
+> ## mean and standard deviation of square root transformed ensemble forecasts
+> RainIbk$sqrtensmean <- 
++   apply(sqrt(RainIbk[,grep('^rainfc',names(RainIbk))]), 1, mean)
+> RainIbk$sqrtenssd <- 
++   apply(sqrt(RainIbk[,grep('^rainfc',names(RainIbk))]), 1, sd)
+> 
+> ## climatological deciles
+> q <- unique(quantile(RainIbk$rain, seq(0.1, 0.9, 0.1)))
+> 
+> ## fit ordinary extended logistic regression with ensemble mean as 
+> ## predictor variable
+> XLR <- hxlr(sqrt(rain) ~ sqrtensmean, data = RainIbk, thresholds = sqrt(q))
+Loading required namespace: ordinal
+> ## print
+> XLR
+
+Call:
+hxlr(formula = sqrt(rain) ~ sqrtensmean, data = RainIbk, thresholds = sqrt(q))
+
+Coefficients (location model):
+(Intercept)   thresholds  sqrtensmean  
+     0.8261       0.8303       0.6792  
+
+No coefficients (in scale model)
+
+---
+> ## summary
+> summary(XLR)
+
+Call:
+hxlr(formula = sqrt(rain) ~ sqrtensmean, data = RainIbk, thresholds = sqrt(q))
+
+
+Coefficients:
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  0.82607    0.06242   13.23   <2e-16 ***
+thresholds   0.83031    0.01247   66.61   <2e-16 ***
+sqrtensmean  0.67925    0.01889   35.96   <2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+Log-likelihood: -9733 on 3 Df
+Number of iterations in BFGS optimization: 12 
+> 
+> 
+> ## fit ordinary extended logistic regression with ensemble mean 
+> ## and standard deviation as predictor variables
+> XLRS <- hxlr(sqrt(rain) ~ sqrtensmean + sqrtenssd, data = RainIbk, 
++   thresholds = sqrt(q))
+> ## fit heteroscedastic extended logistic regression with ensemble 
+> ## standard deviation as predictor for the scale
+> HXLR <- hxlr(sqrt(rain) ~ sqrtensmean | sqrtenssd, data = RainIbk, 
++   thresholds = sqrt(q))
+> 
+> ## compare AIC of different models
+> AIC(XLR, XLRS, HXLR)
+     df      AIC
+XLR   3 19471.48
+XLRS  4 19470.93
+HXLR  4 19417.48
+> 
+> ## XLRS and HXLR are nested in XLR -> likelihood-ratio-tests
+> if(require("lmtest")) {
++   lrtest(XLR, XLRS)
++   lrtest(XLR, HXLR)
++ }
+Loading required package: lmtest
+Loading required package: zoo
+
+Attaching package: ‘zoo’
+
+The following objects are masked from ‘package:base’:
+
+    as.Date, as.Date.numeric
+
+Likelihood ratio test
+
+Model 1: sqrt(rain) ~ sqrtensmean | 1
+Model 2: sqrt(rain) ~ sqrtensmean | sqrtenssd
+  #Df  LogLik Df  Chisq Pr(>Chisq)    
+1   3 -9732.7                         
+2   4 -9704.7  1 55.999  7.252e-14 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+> 
+> ## Not run: 
+> ##D ###################################################################
+> ##D ## Cross-validation and bootstrapping RPS for different models 
+> ##D ## (like in Messner 2013). 
+> ##D N <- NROW(RainIbk)
+> ##D ## function that returns model fits
+> ##D fits <- function(data, weights = rep(1, N)) {
+> ##D   list(
+> ##D     "XLR"    = hxlr(sqrt(rain) ~ sqrtensmean, data = data, 
+> ##D       weights = weights, thresholds = sqrt(q)),
+> ##D     "XLR:S"  = hxlr(sqrt(rain) ~ sqrtensmean + sqrtenssd, data = data, 
+> ##D       weights = weights, thresholds = sqrt(q)),
+> ##D     "XLR:SM" = hxlr(sqrt(rain) ~ sqrtensmean + I(sqrtensmean*sqrtenssd), 
+> ##D       data = data, weights = weights, thresholds = sqrt(q)),
+> ##D     "HXLR"   = hxlr(sqrt(rain) ~ sqrtensmean | sqrtenssd, data = data, 
+> ##D       weights = weights, thresholds = sqrt(q)),
+> ##D     "HXLR:S" = hxlr(sqrt(rain) ~ sqrtensmean + sqrtenssd | sqrtenssd, 
+> ##D       data = data, weights = weights, thresholds = sqrt(q))
+> ##D   )
+> ##D }
+> ##D 
+> ##D 
+> ##D ## cross validation
+> ##D id <- sample(1:10, N, replace = TRUE)
+> ##D obs <- NULL
+> ##D pred <- list(NULL)
+> ##D for(i in 1:10) {
+> ##D   ## splitting into test and training data set
+> ##D   trainIndex <- which(id != i)     
+> ##D   testIndex <- which(id == i)			     
+> ##D   ## weights that are used for fitting the models
+> ##D   weights <- as.numeric(table(factor(trainIndex, levels = c(1:N))))
+> ##D   ## testdata
+> ##D   testdata <- RainIbk[testIndex,]
+> ##D   ## observations    
+> ##D   obs <- c(obs, RainIbk$rain[testIndex])
+> ##D   ## estimation
+> ##D   modelfits <- fits(RainIbk, weights)
+> ##D   ## Prediction
+> ##D   pred2 <- lapply(modelfits, predict, newdata = testdata, type = "cumprob")
+> ##D   pred <- mapply(rbind, pred, pred2, SIMPLIFY = FALSE)
+> ##D }
+> ##D names(pred) <- c(names(modelfits))
+> ##D 
+> ##D ## function to compute RPS
+> ##D rps <- function(pred, obs) {
+> ##D   OBS <- NULL
+> ##D   for(i in 1:N) 
+> ##D     OBS <- rbind(OBS, rep(0:1, c(obs[i] - 1, length(q) - obs[i] + 1)))
+> ##D   apply((OBS-pred)^2, 1, sum)
+> ##D }
+> ##D 
+> ##D ## compute rps
+> ##D RPS <- lapply(pred, rps, obs = as.numeric(cut(obs, c(-Inf, q, Inf))))
+> ##D 
+> ##D ## bootstrapping mean rps 
+> ##D rpsall <- NULL
+> ##D for(i in 1:250) {
+> ##D   index <- sample(length(obs), replace = TRUE)
+> ##D   rpsall <- rbind(rpsall, sapply(RPS, function(x) mean(x[index])))
+> ##D }
+> ##D   
+> ##D rpssall <- 1 - rpsall/rpsall[,1]
+> ##D boxplot(rpssall[,-1], ylab = "RPSS", main = "RPSS relative to XLR")
+> ##D abline(h = 0, lty = 2)
+> ## End(Not run)
+> 
+> 
+> 
+> ### * <FOOTER>
+> ###
+> options(digits = 7L)
+> base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
+Time elapsed:  6.776 0.232 7.045 0 0 
+> grDevices::dev.off()
+null device 
+          1 
+> ###
+> ### Local variables: ***
+> ### mode: outline-minor ***
+> ### outline-regexp: "\\(> \\)?### [*]+" ***
+> ### End: ***
+> quit('no')

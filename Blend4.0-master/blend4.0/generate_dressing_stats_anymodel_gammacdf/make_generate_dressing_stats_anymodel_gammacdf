@@ -1,0 +1,11 @@
+# -m64?
+FFLAGS77 = -c -C -O4  -fcheck=all
+FFLAGS   = -C -O4 -fcheck=all
+FFLAGSC   = -c -C -O4 -fcheck=all
+FC = gfortran
+LIB = -L/opt/local/lib
+INC = -I/usr/local/include
+INC2 = -I/opt/local/include
+
+all:
+	$(FC) $(FFLAGS)  $(INC2)  $(INC2) -o generate_dressing_stats_anymodel_gammacdf.x  generate_dressing_stats_anymodel_gammacdf.f90 check.f90 read_conusmask.f90 read_forecasts_on_CCPA.f90  determine_gamma_parameters_for_quantile_mapping.f90 control_quantile_mapping_singlemodel_gamma.f90  read_precipitation_analysis.f90 compute_closest_histogram.f90 doy.f updat.f gasdev.f ran1.f ran3.f quantile_map_x25_gamma2.f90 cumgam.f90 qnorm.f90 pnorm.f90 dnorm.f90 gamma.f90 pgamma.f90 dgamma.f90 qgamma.f90 gamma_inc.f90 error_f.f90 error_fc.f90 rlog.f90 rexp.f90 exparg.f90 gam1.f90 ipmpar.f90 cumnor.f90 r8_swap.f90 read_quantile_lookup.f90 $(LIB) -lnetcdf -lhdf5 -lhdf5_hl -lnetcdff

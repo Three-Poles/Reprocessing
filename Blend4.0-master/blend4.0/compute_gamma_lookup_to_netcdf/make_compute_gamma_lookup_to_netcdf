@@ -1,0 +1,11 @@
+# -m64?
+FFLAGS77 = -c -C -O4  -fcheck=all
+FFLAGS   = -C -O4 -fcheck=all
+FFLAGSC   = -c -C -O4 -fcheck=all
+FC = gfortran
+LIB = -L/opt/local/lib
+INC = -I/usr/local/include
+INC2 = -I/opt/local/include
+
+all:
+	$(FC) $(FFLAGS)  $(INC2)  $(INC2) -o compute_gamma_lookup_to_netcdf.x  compute_gamma_lookup_to_netcdf.f90 check.f90 cumgam.f90 qnorm.f90 pnorm.f90 dnorm.f90 gamma.f90 pgamma.f90 dgamma.f90 qgamma.f90 gamma_inc.f90 error_f.f90 error_fc.f90 rlog.f90 rexp.f90 exparg.f90 gam1.f90 ipmpar.f90 cumnor.f90 r8_swap.f90 $(LIB) -lnetcdf -lhdf5 -lhdf5_hl -lnetcdff

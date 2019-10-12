@@ -1,0 +1,81 @@
+useDynLib(crch, .registration = TRUE)
+import("stats", "Formula", "scoringRules")
+importFrom("utils", "tail")
+importFrom("graphics", "abline", "axis", "par", "plot", "strwidth", "barplot", 
+  "hist", "legend", "title")
+importFrom("sandwich", "estfun")
+importFrom("grDevices", "gray.colors")
+
+export(
+  "crch",
+  "trch",
+  "crch.control",
+  "crch.fit",
+  "crch.stabsel",
+  "getSummary.crch",
+  "hxlr",
+  "hxlr.control",
+  "dcnorm",
+  "pcnorm",
+  "qcnorm",
+  "rcnorm",
+  "dclogis",
+  "pclogis",
+  "qclogis",
+  "rclogis",
+  "dct",
+  "pct",
+  "qct",
+  "rct",
+  "dtnorm",
+  "ptnorm",
+  "qtnorm",
+  "rtnorm",
+  "dtlogis",
+  "ptlogis",
+  "qtlogis",
+  "rtlogis",
+  "dtt",
+  "ptt",
+  "qtt",
+  "rtt",
+  "crch.boost",
+  "crch.boost.fit"
+)
+
+## methods for crch
+S3method("coef", "crch")
+S3method("fitted", "crch")
+S3method("logLik", "crch")
+S3method("predict", "crch")
+S3method("print", "crch")
+S3method("print", "summary.crch")
+S3method("residuals", "crch")
+S3method("summary", "crch")
+S3method("terms", "crch")
+S3method("vcov", "crch")
+S3method("update", "crch")
+S3method("model.frame", "crch")
+S3method("model.matrix", "crch")
+S3method("estfun", "crch")
+S3method("crps", "crch")
+S3method("plot", "crch.boost")
+S3method("coef", "crch.boost")
+S3method("logLik", "crch.boost")
+S3method("predict", "crch.boost")
+S3method("print", "crch.boost")
+S3method("summary", "crch.boost")
+S3method("print", "summary.crch.boost")
+S3method("print", "stabsel.crch")
+S3method("plot",  "stabsel.crch")
+
+## methods for hxlr
+S3method("logLik", "hxlr")
+S3method("predict", "hxlr")
+S3method("print", "hxlr")
+S3method("print", "summary.hxlr")
+S3method("summary", "hxlr")
+S3method("terms", "hxlr")
+S3method("fitted", "hxlr")
+S3method("coef", "hxlr")
+S3method("vcov", "hxlr")

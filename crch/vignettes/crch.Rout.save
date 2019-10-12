@@ -1,0 +1,162 @@
+
+> options(width = 70, prompt = "R> ", continue = "+  ")
+
+> library("crch")
+
+> library("crch")
+
+> data("RainIbk", package = "crch")
+
+> RainIbk <- sqrt(RainIbk)
+
+> RainIbk$ensmean <- apply(RainIbk[, grep("^rainfc", 
++     names(RainIbk))], 1, mean)
+
+> RainIbk$enssd <- apply(RainIbk[, grep("^rainfc", names(RainIbk))], 
++     1, sd)
+
+> RainIbk <- subset(RainIbk, enssd > 0)
+
+> plot(rain ~ ensmean, data = RainIbk, pch = 19, col = gray(0, 
++     alpha = 0.2))
+
+> abline(0, 1, col = "red")
+
+> CRCH <- crch(rain ~ ensmean | log(enssd), data = RainIbk, 
++     left = 0, dist = "logistic")
+
+> summary(CRCH)
+
+Call:
+crch(formula = rain ~ ensmean | log(enssd), data = RainIbk, 
+    dist = "logistic", left = 0)
+
+Standardized residuals:
+    Min      1Q  Median      3Q     Max 
+-3.5780 -0.6554  0.1673  1.1189  7.4990 
+
+Coefficients (location model):
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept) -0.85266    0.06903  -12.35   <2e-16 ***
+ensmean      0.78686    0.01921   40.97   <2e-16 ***
+
+Coefficients (scale model with log link):
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  0.11744    0.01460   8.046 8.58e-16 ***
+log(enssd)   0.27055    0.03503   7.723 1.14e-14 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+
+Distribution: logistic
+Log-likelihood: -8921 on 4 Df
+Number of iterations in BFGS optimization: 15 
+
+> abline(coef(CRCH)[1:2], col = "blue")
+
+> plot(rain ~ ensmean, data = RainIbk, pch = 19, col = gray(0, 
++     alpha = 0.2))
+
+> abline(0, 1, col = "red", lwd = 2)
+
+> abline(coef(CRCH)[1:2], col = "blue", lwd = 2)
+
+> CR <- crch(rain ~ ensmean, data = RainIbk, left = 0, 
++     dist = "logistic")
+
+> cbind(AIC(CR, CRCH), BIC = BIC(CR, CRCH)[, 2])
+     df      AIC      BIC
+CR    3 17905.69 17925.22
+CRCH  4 17850.30 17876.33
+
+> CRCHgau <- crch(rain ~ ensmean | log(enssd), data = RainIbk, 
++     left = 0, dist = "gaussian")
+
+> CRCHstud <- crch(rain ~ ensmean | log(enssd), data = RainIbk, 
++     left = 0, dist = "student")
+
+> AIC(CRCH, CRCHgau, CRCHstud)
+         df      AIC
+CRCH      4 17850.30
+CRCHgau   4 17897.23
+CRCHstud  5 17850.65
+
+> a <- seq(-5, 5, 0.01)
+
+> df <- exp(tail(coef(CRCHstud), 1))
+
+> plot(a, dt(a, df), type = "l", xlab = "", ylab = "density", 
++     main = "Probability density function", lwd = 2)
+
+> lines(a, dlogis(a * dt(0, df)/dlogis(0)) * dt(0, df)/dlogis(0), 
++     col = 2, lwd = 2, lty = 2)
+
+> lines(a, dnorm(a * dt(0, df)/dnorm(0)) * dt(0, df)/dnorm(0), 
++     col = 4, lwd = 1, lty = 1)
+
+> legend("topright", lwd = c(2, 2, 1), lty = c(1, 2, 
++     1), col = c(1, 2, 4), c("student-t", "scaled logistic", "scaled normal"), 
++     bty = "n" .... [TRUNCATED] 
+
+> library("glmx")
+
+> BIN <- hetglm(I(rain > 0) ~ ensmean | log(enssd), 
++     data = RainIbk, family = binomial(link = "logit"))
+
+> TRCH <- crch(rain ~ ensmean | log(enssd), data = RainIbk, 
++     subset = rain > 0, left = 0, dist = "logistic", truncated = TRUE)
+
+> cbind(CRCH = c(coef(CRCH, "location")/exp(coef(CRCH, 
++     "scale"))[1], coef(CRCH, "scale")[2]), BIN = coef(BIN), TRCH = c(coef(TRCH, 
++     "loca ..." ... [TRUNCATED] 
+                  CRCH        BIN      TRCH
+(Intercept) -0.7581811 -1.0181715 0.2635421
+ensmean      0.6996699  0.7789091 0.5455966
+log(enssd)   0.2705476  0.4539908 0.2326229
+
+> loglik <- c(Censored = logLik(CRCH), `Two-Part` = logLik(BIN) + 
++     logLik(TRCH))
+
+> df <- c(4, 7)
+
+> aic <- -2 * loglik + 2 * df
+
+> bic <- -2 * loglik + log(nrow(RainIbk)) * df
+
+> cbind(df, AIC = aic, BIC = bic)
+         df      AIC      BIC
+Censored  4 17850.30 17876.33
+Two-Part  7 17744.82 17790.39
+
+> newdata <- data.frame(ensmean = 1.8, enssd = 0.9)
+
+> predict(CRCH, newdata, type = "quantile", at = 0.5)^2
+        1 
+0.3177399 
+
+> p <- predict(BIN, newdata)
+
+> predict(TRCH, newdata, type = "quantile", at = (p - 
++     0.5)/p)^2
+      1 
+0.4156972 
+
+> mu <- predict(CRCH, newdata, type = "location")
+
+> sigma <- predict(CRCH, newdata, type = "scale")
+
+> pclogis(sqrt(5), mu, sigma, lower.tail = FALSE, left = 0)
+[1] 0.177983
+
+> mu <- predict(TRCH, newdata, type = "location")
+
+> sigma <- predict(TRCH, newdata, type = "scale")
+
+> p * ptlogis(sqrt(5), mu, sigma, lower.tail = FALSE, 
++     left = 0)
+        1 
+0.2108671 
+
+ *** Run successfully completed ***
+> proc.time()
+   user  system elapsed 
+  6.418   0.020   6.425 

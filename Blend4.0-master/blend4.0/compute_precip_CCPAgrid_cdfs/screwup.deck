@@ -1,0 +1,26 @@
+#!/bin/tcsh
+
+
+#python compute_precip_CCPAgrid_cdfs.py CMC 24 2016021000
+python compute_precip_CCPAgrid_cdfs.py CMC 48 2016021000
+python compute_precip_CCPAgrid_cdfs.py CMC 72 2016021000
+python compute_precip_CCPAgrid_cdfs.py CMC 96 2016021000
+python compute_precip_CCPAgrid_cdfs.py CMC 120 2016021000
+python compute_precip_CCPAgrid_cdfs.py CMC 144 2016021000
+python compute_precip_CCPAgrid_cdfs.py CMC 168 2016021000
+
+python compute_precip_CCPAgrid_cdfs.py NCEP 24 2016021000
+python compute_precip_CCPAgrid_cdfs.py NCEP 48 2016021000
+python compute_precip_CCPAgrid_cdfs.py NCEP 72 2016021000
+python compute_precip_CCPAgrid_cdfs.py NCEP 96 2016021000
+python compute_precip_CCPAgrid_cdfs.py NCEP 120 2016021000
+python compute_precip_CCPAgrid_cdfs.py NCEP 144 2016021000
+python compute_precip_CCPAgrid_cdfs.py NCEP 168 2016021000
+
+python compute_precip_CCPAgrid_cdfs.py ECMWF 24 2016021000
+python compute_precip_CCPAgrid_cdfs.py ECMWF 48 2016021000
+python compute_precip_CCPAgrid_cdfs.py ECMWF 72 2016021000
+python compute_precip_CCPAgrid_cdfs.py ECMWF 96 2016021000
+python compute_precip_CCPAgrid_cdfs.py ECMWF 120 2016021000
+python compute_precip_CCPAgrid_cdfs.py ECMWF 144 2016021000
+python compute_precip_CCPAgrid_cdfs.py ECMWF 168 2016021000
